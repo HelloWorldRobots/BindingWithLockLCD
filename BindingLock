@@ -1,0 +1,129 @@
+// Automatic unbinding, Created By Akshat Sharma @ 12/11/2021 Last edited at the give date @ 10pm
+
+// Adding comments and finalized wiring soon.... 
+
+
+#include <Adafruit_LiquidCrystal.h>
+#include <AccelStepper.h>
+
+Adafruit_LiquidCrystal lcd(4,5,6,7,8,11);
+
+#define motor_pin1 3;
+#define motor_pin2 4;
+#define motor_pin3 5;
+#define motor_pin4 6;
+
+#define MotorInterfaceType 8
+
+AccelStepper stepper = AccelStepper(MotorInterfaceType, motorpin1, motor_pin2, motor_pin3, motor_pin4);
+
+const int x_pin = 0;
+const int y_pin = 1;
+const int SW_pin = 3;
+const int LED_GREEN = 13;
+const int red_led = 11;
+const int green_led = 10;
+const int blue_led = 9;
+int counter = 0;
+int counter2 = 0;
+int counter3 = 0;
+const int START = 2;
+const int BUZZER = 13;
+
+void setup() {
+  stepper.SetMaxSpeed(1000); // Steps per "second"
+  pinMode(START, INPUT);
+  digitalWrite(START, HIGH);
+  pinMode(BUZZER, OUTPUT);
+  pinMode(red_led, OUTPUT);
+  pinMode(green_led, OUTPUT);
+  pinMode(blue_led, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  noTone(BUZZER);
+  lcd.begin(16,2);
+  lcd.print("Started !")
+  for(int i = 0; i<=3;i++){
+    stepper.setSpeed(500);
+    if((counter > 1) && (counter2 > 3)){
+      lcd.clear();
+      lcd.print("Finished, No Errors !");
+      break;
+    }
+    if(i >= 1){
+    lcd.clear();
+    lcd.print("Error 01 (LOOP)");
+    Serial.println(digitalRead(START));
+    Serial.println("Started! ");
+    delay(500);
+    digitalWrite(LED_GREEN, HIGH);
+    delay(500);
+    digitalWrite(LED_GREEN, LOW);
+    }
+  
+  Serial.begin(115200);
+  analogWrite(red_led, 0);
+     analogWrite(green_led, 0);
+     analogWrite(blue_led, 0);
+  while(true){
+  
+    Serial.println(analogRead(x_pin));
+    delay(1000);
+    if(analogRead(x_pin > 900)){
+      digitalWrite(red_led, HIGH);
+      
+        Serial.println(analogRead(x_pin));
+        delay(1000);
+        if(analogRead(x_pin)< 40){
+          lcd.clear();
+          lcd.print("First Lock");
+          Serial.println("Loop, RUNS");
+          digitalWrite(red_led, HIGH);
+          delay(1000);
+          counter++;
+        
+      }
+      if(analogRead(x_pin) > 600){
+         lcd.clear();
+         lcd.print("Second Lock");
+         Serial.println("Second Lock");
+         digitalWrite(red_led, LOW);
+         digitalWrite(green_led, HIGH);
+         counter2++;
+      }
+      
+      if((counter > 1) && (counter2 > 3)){
+        lcd.clear();
+        lcd.print("Finished... Checking for errors !");
+        Serial.println("Loop Achieved");
+        digitalWrite(red_led, LOW);
+        digitalWrite(green_led, HIGH);
+        digitalWrite(blue_led, HIGH);
+        tone(BUZZER, 1000);
+        stepper.runSpeed();
+        delay(5000);
+        noTone(BUZZER);
+        break;
+        } 
+      digitalWrite(green_led, LOW);
+      digitalWrite(red_led, HIGH);
+      delay(1000);
+    }
+    else if(analogRead(x_pin) < 900 && analogRead(x_pin) > 500){
+      Serial.println("This loop runs aswell! ");
+      digitalWrite(red_led, HIGH);
+      delay(1000);
+    }
+    
+    }
+    
+    
+  }
+
+    }
+ 
+void loop() {
+
+// Empty
+
+
+}
